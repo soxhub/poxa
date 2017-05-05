@@ -1,16 +1,46 @@
-FROM msaraiva/elixir-dev:1.2.4
+FROM alpine:3.4
 
-ENV APP_NAME poxa
+# Install erlang
+RUN set -x \
+  && apk --no-cache --update add \
+    erlang \
+    erlang-asn1 \
+    erlang-crypto \
+    erlang-dev\
+    erlang-erl-interface \
+    erlang-eunit \
+    erlang-inets \
+    erlang-parsetools \
+    erlang-public-key \
+    erlang-sasl \
+    erlang-ssl \
+    erlang-syntax-tools \
+  && rm -rf /var/cache/apk/*
 
-RUN apk --update add erlang-xmerl erlang-crypto erlang-sasl && rm -rf /var/cache/apk/*
+# Install elixir
+ENV ELIXIR_VERSION 1.3.3
 
-COPY . /source
-WORKDIR /source
+RUN set -x \
+  && apk --no-cache --update add --virtual build-dependencies ca-certificates git openssl \
+  && wget https://github.com/elixir-lang/elixir/releases/download/v${ELIXIR_VERSION}/Precompiled.zip \
+  && mkdir -p /opt/elixir-${ELIXIR_VERSION}/ \
+  && unzip Precompiled.zip -d /opt/elixir-${ELIXIR_VERSION}/ \
+  && rm Precompiled.zip \
+  && rm -rf /var/cache/apk/*
 
-RUN mix local.hex --force && mix local.rebar --force
-RUN MIX_ENV=prod mix deps.get
-RUN MIX_ENV=prod mix compile
-RUN MIX_ENV=prod mix release --verbosity=verbose --no-confirm-missing
-RUN mkdir /app && cp -r rel/$APP_NAME /app && rm -rf /source
+ENV PATH $PATH:/opt/elixir-${ELIXIR_VERSION}/bin
 
-CMD trap exit TERM; /app/$APP_NAME/bin/$APP_NAME foreground & wait
+ENV MIX_ENV prod
+ENV PORT 3008
+EXPOSE $PORT
+
+COPY . /src
+
+WORKDIR /src/
+
+RUN set -x \
+  && mix local.hex --force \
+  && mix local.rebar --force \
+  && mix do deps.get, compile, compile.protocols
+
+CMD ["mix", "run", "--no-halt"]
