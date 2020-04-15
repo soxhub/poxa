@@ -1,4 +1,8 @@
-FROM trenpixster/elixir:1.0.1
+FROM elixir:1.2.4
+
+RUN apt-get update && \
+  apt-get upgrade -y && \
+  apt-get install -y git
 
 COPY . /src
 WORKDIR /src/
