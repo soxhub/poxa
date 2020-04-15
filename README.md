@@ -83,6 +83,7 @@ PORT=8080
 POXA_APP_KEY=app_key
 POXA_SECRET=secret
 POXA_APP_ID=app_id
+POXA_PAYLOAD_SIZE=10000
 ```
 
 Or you can setup a configuration file like this:

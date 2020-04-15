@@ -19,14 +19,14 @@ defmodule Poxa do
     ])
     case load_config do
       {:ok, config} ->
-        Logger.info "Starting Poxa using app_key: #{config.app_key}, app_id: #{config.app_id}, app_secret: #{config.app_secret} on port #{config.port}"
+        Logger.info "Starting Poxa using app_key: #{config.app_key}, app_id: #{config.app_id}, app_secret: #{config.app_secret}, payload_size: #{config.payload_size} on port #{config.port}"
         {:ok, _} = :cowboy.start_http(:http, 100,
                                       [port: config.port],
                                       [env: [dispatch: dispatch]])
         run_ssl(dispatch)
         Poxa.Supervisor.start_link
       :invalid_configuration ->
-        Logger.error "Error on start, set app_key, app_id and app_secret"
+        Logger.error "Error on start, set app_key, app_id, app_secret, and payload_size"
         exit(:invalid_configuration)
     end
 
@@ -40,8 +40,10 @@ defmodule Poxa do
       {:ok, app_id} = Application.fetch_env(:poxa, :app_id)
       {:ok, app_secret} = Application.fetch_env(:poxa, :app_secret)
       {:ok, port} = Application.fetch_env(:poxa, :port)
+      {:ok, payload_size} = Application.fetch_env(:poxa, :payload_size)
+
       {:ok, %{app_key: app_key, app_id: app_id,
-              app_secret: app_secret, port: to_integer(port)}}
+              app_secret: app_secret, payload_size: to_integer(payload_size), port: to_integer(port)}}
     rescue
       MatchError -> :invalid_configuration
     end

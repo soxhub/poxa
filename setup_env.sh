@@ -11,10 +11,12 @@ fi
 [ -z "$POXA_APP_ID" ] && echo "POXA_APP_ID not set" && exit 1;
 [ -z "$POXA_APP_KEY" ] && echo "POXA_APP_KEY not set" && exit 1;
 [ -z "$POXA_SECRET" ] && echo "POXA_SECRET not set" && exit 1;
+[ -z "$POXA_PAYLOAD_SIZE" ] && echo "POXA_PAYLOAD_SIZE not set" && exit 1;
 echo 'poxa.port = '$PORT>>poxa.conf
 echo 'poxa.app_key = "'$POXA_APP_KEY'"'>>poxa.conf
 echo 'poxa.app_secret = "'$POXA_SECRET'"'>>poxa.conf
 echo 'poxa.app_id = "'$POXA_APP_ID'"'>>poxa.conf
+echo 'poxa.payload_size = "'$POXA_PAYLOAD_SIZE'"'>>poxa.conf
 
 #copy config
 mkdir /app/running-config
